@@ -8,24 +8,38 @@ import (
 	"path/filepath"
 )
 
+type LibraryItem struct {
+	Imdb *imdb.MovieResult
+	MediaInfo *MediaInfo
+}
+
 func main() {
 
 
-	library := make(map[string][]*imdb.MovieResult)
+	library := make(map[string][]*LibraryItem)
 	mfChan := make(chan *MediaInfo)
-	mImdbChan := make(chan *imdb.MovieResult)
+	mImdbChan := make(chan *LibraryItem)
 	go GetMediaInfo(os.Args[1], mfChan)
 
 	go getMediaIMDBID(mfChan,mImdbChan)
 	for i := range mImdbChan {
-		library[i.ImdbID] = append(library[i.ImdbID],i)
+		library[i.Imdb.ImdbID] = append(library[i.Imdb.ImdbID],i)
 	}
 	for k,l:=range library{
-		fmt.Printf("%s:%d\n",k,len(l))
+		fmt.Printf("%s:%d",k,len(l))
+		if len(l) > 0{
+			fmt.Printf("[")
+			for _,i:= range l{
+				fmt.Printf("%s,",i.MediaInfo.Media.Ref)
+			}
+			fmt.Printf("]")
+		}
+		fmt.Printf("\n")
+
 	}
 }
 
-func getMediaIMDBID(mfChan chan *MediaInfo,mImdbChan chan *imdb.MovieResult) {
+func getMediaIMDBID(mfChan chan *MediaInfo, mImdbChan chan *LibraryItem) {
 	defer close(mImdbChan)
 	for m := range mfChan {
 		t, err := m.GetMovieTrackID()
@@ -46,7 +60,8 @@ func getMediaIMDBID(mfChan chan *MediaInfo,mImdbChan chan *imdb.MovieResult) {
 		}
 		if result != nil {
 			log.Printf("%s\n", result.ImdbID)
-			mImdbChan <- result
+			l := LibraryItem{result,m}
+			mImdbChan <- &l
 		}
 
 	}
