@@ -9,13 +9,19 @@ import (
 )
 
 func main() {
+
+
+	library := make(map[string][]*imdb.MovieResult)
 	mfChan := make(chan *MediaInfo)
 	mImdbChan := make(chan *imdb.MovieResult)
 	go GetMediaInfo(os.Args[1], mfChan)
 
 	go getMediaIMDBID(mfChan,mImdbChan)
 	for i := range mImdbChan {
-		fmt.Printf("%s\n", i.ImdbID)
+		library[i.ImdbID] = append(library[i.ImdbID],i)
+	}
+	for k,l:=range library{
+		fmt.Printf("%s:%d\n",k,len(l))
 	}
 }
 
@@ -39,6 +45,7 @@ func getMediaIMDBID(mfChan chan *MediaInfo,mImdbChan chan *imdb.MovieResult) {
 			log.Println(err.Error())
 		}
 		if result != nil {
+			log.Printf("%s\n", result.ImdbID)
 			mImdbChan <- result
 		}
 
