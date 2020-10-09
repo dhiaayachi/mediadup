@@ -1,2 +1,2 @@
-github.com/zhulik/go_mediainfo v0.0.0-20151224204459-29d57b2a6ea0 h1:LArnVt1z8677ir0iplBYjb9z2CGds34OLrtvcrjMAGw=
-github.com/zhulik/go_mediainfo v0.0.0-20151224204459-29d57b2a6ea0/go.mod h1:MRoR7mHzwQMd2TN1G1RTUkIBV+P9mX1DYQz8URX/QCI=
+github.com/kenshaw/imdb v0.0.0-20191105031356-e06d39b2b486 h1:tM3505ZdX8SpWAs6phd+MYhsUfhe+0r6L56cUgv7IcM=
+github.com/kenshaw/imdb v0.0.0-20191105031356-e06d39b2b486/go.mod h1:SubWgBWZLnMIOUbJ7Sy+nKwf7kk9WrqR8H3mZgf/tVU=

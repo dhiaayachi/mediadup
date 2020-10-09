@@ -1,114 +1,99 @@
 package mediainfo
 
 import (
-	"encoding/xml"
-"flag"
-"fmt"
+	"encoding/json"
+	"flag"
+	"fmt"
 	"os"
 	"os/exec"
-"strings"
+	"strings"
 )
 
 var mediainfoBinary = flag.String("mediainfo-bin", "mediainfo", "the path to the mediainfo binary if it is not in the system $PATH")
 
-type mediainfo struct {
-	XMLName xml.Name `xml:"MediaInfo"`
-	File    file     `xml:"File"`
-}
-
-type track struct {
-	XMLName                   xml.Name `xml:"track"`
-	Type                      string   `xml:"type,attr"`
-	File_name                 string   `xml:"File_name"`
-	Format_Info               string   `xml:"Format_Info"`
-	Color_space               string   `xml:"Color_space"`
-	Complete_name             string   `xml:"Complete_name"`
-	Format_profile            string   `xml:"Format_profile"`
-	File_extension            string   `xml:"File_extension"`
-	Chroma_subsampling        string   `xml:"Chroma_subsampling"`
-	Writing_application       string   `xml:"Writing_application"`
-	Proportion_of_this_stream string   `xml:"Proportion_of_this_stream"`
-	Width                     []string `xml:"Width"`
-	Height                    []string `xml:"Height"`
-	Format                    []string `xml:"Format"`
-	Duration                  []string `xml:"Duration"`
-	Bit_rate                  []string `xml:"Bit_rate"`
-	Bit_depth                 []string `xml:"Bit_depth"`
-	Scan_type                 []string `xml:"Scan_type"`
-	File_size                 []string `xml:"File_size"`
-	Frame_rate                []string `xml:"Frame_rate"`
-	Channel_s_                []string `xml:"Channel_s_"`
-	Stream_size               []string `xml:"Stream_size"`
-	Interlacement             []string `xml:"Interlacement"`
-	Bit_rate_mode             []string `xml:"Bit_rate_mode"`
-	Sampling_rate             []string `xml:"Sampling_rate"`
-	Writing_library           []string `xml:"Writing_library"`
-	Frame_rate_mode           []string `xml:"Frame_rate_mode"`
-	Overall_bit_rate          []string `xml:"Overall_bit_rate"`
-	Display_aspect_ratio      []string `xml:"Display_aspect_ratio"`
-	Overall_bit_rate_mode     []string `xml:"Overall_bit_rate_mode"`
-	Format_settings__CABAC    []string `xml:"Format_settings__CABAC"`
-	Format_settings__ReFrames []string `xml:"Format_settings__ReFrames"`
-}
-
-type file struct {
-	XMLName xml.Name `xml:"File"`
-	Tracks  []track  `xml:"track"`
-}
-
 type MediaInfo struct {
-	General general `json:"general,omitempty"`
-	Video   video   `json:"video,omitempty"`
-	Audio   audio   `json:"audio,omitempty"`
-	Menu    menu    `json:"menu,omitempty"`
+	Media Media `json:"media"`
+}
+type Extra struct {
+}
+type Track struct {
+	Type                           string `json:"@type"`
+	UniqueID                       string `json:"UniqueID,omitempty"`
+	VideoCount                     string `json:"VideoCount,omitempty"`
+	AudioCount                     string `json:"AudioCount,omitempty"`
+	TextCount                      string `json:"TextCount,omitempty"`
+	MenuCount                      string `json:"MenuCount,omitempty"`
+	FileExtension                  string `json:"FileExtension,omitempty"`
+	Format                         string `json:"Format,omitempty"`
+	FormatVersion                  string `json:"Format_Version,omitempty"`
+	FileSize                       string `json:"FileSize,omitempty"`
+	Duration                       string `json:"Duration,omitempty"`
+	OverallBitRateMode             string `json:"OverallBitRate_Mode,omitempty"`
+	OverallBitRate                 string `json:"OverallBitRate,omitempty"`
+	FrameRate                      string `json:"FrameRate,omitempty"`
+	FrameCount                     string `json:"FrameCount,omitempty"`
+	StreamSize                     string `json:"StreamSize,omitempty"`
+	IsStreamable                   string `json:"IsStreamable,omitempty"`
+	Title                          string `json:"Title,omitempty"`
+	Movie                          string `json:"Movie,omitempty"`
+	EncodedDate                    string `json:"Encoded_Date,omitempty"`
+	FileModifiedDate               string `json:"File_Modified_Date,omitempty"`
+	FileModifiedDateLocal          string `json:"File_Modified_Date_Local,omitempty"`
+	EncodedApplication             string `json:"Encoded_Application,omitempty"`
+	EncodedLibrary                 string `json:"Encoded_Library,omitempty"`
+	StreamOrder                    string `json:"StreamOrder,omitempty"`
+	ID                             string `json:"ID,omitempty"`
+	FormatProfile                  string `json:"Format_Profile,omitempty"`
+	FormatLevel                    string `json:"Format_Level,omitempty"`
+	FormatTier                     string `json:"Format_Tier,omitempty"`
+	CodecID                        string `json:"CodecID,omitempty"`
+	BitRate                        string `json:"BitRate,omitempty"`
+	Width                          string `json:"Width,omitempty"`
+	Height                         string `json:"Height,omitempty"`
+	SampledWidth                   string `json:"Sampled_Width,omitempty"`
+	SampledHeight                  string `json:"Sampled_Height,omitempty"`
+	PixelAspectRatio               string `json:"PixelAspectRatio,omitempty"`
+	DisplayAspectRatio             string `json:"DisplayAspectRatio,omitempty"`
+	FrameRateMode                  string `json:"FrameRate_Mode,omitempty"`
+	ColorSpace                     string `json:"ColorSpace,omitempty"`
+	ChromaSubsampling              string `json:"ChromaSubsampling,omitempty"`
+	BitDepth                       string `json:"BitDepth,omitempty"`
+	Delay                          string `json:"Delay,omitempty"`
+	Default                        string `json:"Default,omitempty"`
+	Forced                         string `json:"Forced,omitempty"`
+	ColourDescriptionPresent       string `json:"colour_description_present,omitempty"`
+	ColourDescriptionPresentSource string `json:"colour_description_present_Source,omitempty"`
+	ColourRange                    string `json:"colour_range,omitempty"`
+	ColourRangeSource              string `json:"colour_range_Source,omitempty"`
+	ColourPrimaries                string `json:"colour_primaries,omitempty"`
+	ColourPrimariesSource          string `json:"colour_primaries_Source,omitempty"`
+	TransferCharacteristics        string `json:"transfer_characteristics,omitempty"`
+	TransferCharacteristicsSource  string `json:"transfer_characteristics_Source,omitempty"`
+	MatrixCoefficients             string `json:"matrix_coefficients,omitempty"`
+	MatrixCoefficientsSource       string `json:"matrix_coefficients_Source,omitempty"`
+	FormatCommercialIfAny          string `json:"Format_Commercial_IfAny,omitempty"`
+	FormatSettingsMode             string `json:"Format_Settings_Mode,omitempty"`
+	FormatSettingsEndianness       string `json:"Format_Settings_Endianness,omitempty"`
+	FormatAdditionalFeatures       string `json:"Format_AdditionalFeatures,omitempty"`
+	BitRateMode                    string `json:"BitRate_Mode,omitempty"`
+	Channels                       string `json:"Channels,omitempty"`
+	ChannelPositions               string `json:"ChannelPositions,omitempty"`
+	ChannelLayout                  string `json:"ChannelLayout,omitempty"`
+	SamplesPerFrame                string `json:"SamplesPerFrame,omitempty"`
+	SamplingRate                   string `json:"SamplingRate,omitempty"`
+	SamplingCount                  string `json:"SamplingCount,omitempty"`
+	CompressionMode                string `json:"Compression_Mode,omitempty"`
+	DelaySource                    string `json:"Delay_Source,omitempty"`
+	StreamSizeProportion           string `json:"StreamSize_Proportion,omitempty"`
+	Language                       string `json:"Language,omitempty"`
+	ElementCount                   string `json:"ElementCount,omitempty"`
+	Extra                          Extra  `json:"extra,omitempty"`
+}
+type Media struct {
+	Ref   string  `json:"@ref"`
+	Track []Track `json:"track"`
 }
 
-type general struct {
-	Format                string `json:"format"`
-	Duration              string `json:"duration"`
-	File_size             string `json:"file_size"`
-	Overall_bit_rate_mode string `json:"overall_bit_rate_mode"`
-	Overall_bit_rate      string `json:"overall_bit_rate"`
-	Complete_name         string `json:"complete_name"`
-	File_name             string `json:"file_name"`
-	File_extension        string `json:"file_extension"`
-	Frame_rate            string `json:"frame_rate"`
-	Stream_size           string `json:"stream_size"`
-	Writing_application   string `json:"writing_application"`
-}
-
-type video struct {
-	Width                     string `json:"width"`
-	Height                    string `json:"height"`
-	Format                    string `json:"format"`
-	Bit_rate                  string `json:"bitrate"`
-	Duration                  string `json:"duration"`
-	Format_Info               string `json:"format_info"`
-	Format_profile            string `json:"format_profile"`
-	Format_settings__CABAC    string `json:"format_settings_cabac"`
-	Format_settings__ReFrames string `json:"format_settings__reframes"`
-	Frame_rate                string `json:"frame_rate"`
-	Bit_depth                 string `json:"bit_depth"`
-	Scan_type                 string `json:"scan_type"`
-	Interlacement             string `json:"interlacement"`
-	Writing_library           string `json:"writing_library"`
-}
-
-type audio struct {
-	Format         string `json:"format"`
-	Duration       string `json:"duration"`
-	Bit_rate       string `json:"bitrate"`
-	Channel_s_     string `json:"channels"`
-	Frame_rate     string `json:"frame_rate"`
-	Format_Info    string `json:"format_Info"`
-	Sampling_rate  string `json:"sampling_rate"`
-	Format_profile string `json:"format_profile"`
-}
-
-type menu struct {
-	Format   string `json:"format"`
-	Duration string `json:"duration"`
-}
 
 func IsInstalled() bool {
 	cmd := exec.Command(*mediainfoBinary)
@@ -126,19 +111,14 @@ func IsInstalled() bool {
 }
 
 func (info MediaInfo) IsMedia() bool {
-	return info.Video.Duration != "" && info.Audio.Duration != ""
+	return len(info.Media.Track) > 0
 }
 
 func GetMediaInfo(fname string) (MediaInfo, error) {
 	info := MediaInfo{}
-	minfo := mediainfo{}
-	general := general{}
-	video := video{}
-	audio := audio{}
-	menu := menu{}
 
 	if !IsInstalled() {
-		return info, fmt.Errorf("Must install mediainfo")
+		return info, fmt.Errorf("must install mediainfo")
 	}
 	fin, err := os.Stat(fname)
 	if os.IsNotExist(err) {
@@ -147,70 +127,24 @@ func GetMediaInfo(fname string) (MediaInfo, error) {
 	if fin.IsDir() {
 		return info, fmt.Errorf("media file is a directory")
 	}
-	out, err := exec.Command(*mediainfoBinary, "--Output=XML", "-f", fname).Output()
+	out, err := exec.Command(*mediainfoBinary, "--Output=JSON", "-f", fname).Output()
 
 	if err != nil {
 		return info, err
 	}
 
-	if err := xml.Unmarshal(out, &minfo); err != nil {
+	if err := json.Unmarshal(out, &info); err != nil {
 		return info, err
 	}
-
-	for _, v := range minfo.File.Tracks {
-		if v.Type == "General" {
-			general.Duration = v.Duration[0]
-			general.Format = v.Format[0]
-			general.File_size = v.File_size[0]
-			if len(v.Overall_bit_rate_mode) > 0 {
-				general.Overall_bit_rate_mode = v.Overall_bit_rate_mode[0]
-			}
-			general.Overall_bit_rate = v.Overall_bit_rate[0]
-			general.Complete_name = v.Complete_name
-			general.File_name = v.File_name
-			general.File_extension = v.File_extension
-			general.Frame_rate = v.Frame_rate[0]
-			general.Stream_size = v.Stream_size[0]
-			general.Writing_application = v.Writing_application
-		} else if v.Type == "Video" {
-			video.Width = v.Width[0]
-			video.Height = v.Height[0]
-			video.Format = v.Format[0]
-			video.Bit_rate = v.Bit_rate[0]
-			video.Duration = v.Duration[0]
-			video.Bit_depth = v.Bit_depth[0]
-			video.Scan_type = v.Scan_type[0]
-			video.Format_Info = v.Format_Info
-			video.Frame_rate = v.Frame_rate[0]
-			video.Format_profile = v.Format_profile
-			video.Interlacement = v.Interlacement[1]
-			video.Writing_library = v.Writing_library[0]
-			video.Format_settings__CABAC = v.Format_settings__CABAC[0]
-			video.Format_settings__ReFrames = v.Format_settings__ReFrames[0]
-		} else if v.Type == "Audio" {
-			audio.Format = v.Format[0]
-			audio.Channel_s_ = v.Channel_s_[0]
-			audio.Duration = v.Duration[0]
-			audio.Bit_rate = v.Bit_rate[0]
-			audio.Format_Info = v.Format_Info
-			audio.Frame_rate = v.Frame_rate[0]
-			audio.Sampling_rate = v.Sampling_rate[0]
-			audio.Format_profile = v.Format_profile
-		} else if v.Type == "Menu" {
-			menu.Duration = v.Duration[0]
-			menu.Format = v.Format[0]
-		}
-	}
-	info = MediaInfo{General: general, Video: video, Audio: audio, Menu: menu}
 
 	return info, nil
 }
 
-
-func fileExists(filename string) bool {
-	info, err := os.Stat(filename)
-	if os.IsNotExist(err) {
-		return false
+func (m *MediaInfo) GetMovieTrackID()  (*Track,error){
+	for _,t := range m.Media.Track {
+		if t.Type == "General" {
+			return &t, nil
+		}
 	}
-	return !info.IsDir()
+	return nil,fmt.Errorf("no video track available")
 }

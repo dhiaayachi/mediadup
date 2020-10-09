@@ -1,9 +1,9 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"mediadup/mediainfo"
+	"mediadup/movieid"
 	"os"
 )
 
@@ -13,10 +13,18 @@ func main() {
 		fmt.Println(err.Error())
 		os.Exit(1)
 	}
-	info, err := json.Marshal(mediainfo)
+
+	t,err := mediainfo.GetMovieTrackID()
 	if err != nil {
 		fmt.Println(err.Error())
 		os.Exit(1)
 	}
-	fmt.Println(string(info))
+	movie := t.Movie
+	md := movieid.New()
+	result, err := md.SearchMovie(movie)
+	if err != nil {
+		fmt.Println(err.Error())
+		os.Exit(1)
+	}
+	fmt.Printf("%v", result)
 }
