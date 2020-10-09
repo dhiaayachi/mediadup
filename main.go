@@ -2,13 +2,11 @@ package main
 
 import (
 	"fmt"
-	"mediadup/mediainfo"
-	"mediadup/movieid"
 	"os"
 )
 
 func main() {
-	mediainfo, err := mediainfo.GetMediaInfo(os.Args[1])
+	mediainfo, err := GetMediaInfo(os.Args[1])
 	if err != nil {
 		fmt.Println(err.Error())
 		os.Exit(1)
@@ -20,7 +18,7 @@ func main() {
 		os.Exit(1)
 	}
 	movie := t.Movie
-	md := movieid.New()
+	md := NewMovieId()
 	result, err := md.SearchMovie(movie)
 	if err != nil {
 		fmt.Println(err.Error())
