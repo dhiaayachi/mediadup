@@ -123,16 +123,15 @@ func (info MediaInfo) IsMedia() bool {
 	return false
 }
 
-func GetMediaInfo(fname string) ([]MediaInfo, error) {
+func GetMediaInfo(fname string, mfChan chan *MediaInfo) {
+	defer close(mfChan)
 	if !IsInstalled() {
-		return nil, fmt.Errorf("must install mediainfo")
+		return
 	}
 	_, err := os.Stat(fname)
 	if os.IsNotExist(err) {
-		return nil, fmt.Errorf("media file not found")
+		return
 	}
-
-	var mInfo []MediaInfo
 
 	err = filepath.Walk(fname, func(path string, info os.FileInfo, err error) error {
 		if !info.IsDir() {
@@ -146,15 +145,15 @@ func GetMediaInfo(fname string) ([]MediaInfo, error) {
 			if err := json.Unmarshal(out, &i); err != nil {
 				return nil
 			}
-			mInfo = append(mInfo, i)
-			//println("got a media..." + info.Name())
+			if !i.IsMedia() {
+				return nil
+			}
+			mfChan <- &i
+			println("got a media..." + info.Name())
 		}
 		return nil
 	})
-	if len(mInfo)==0 && err != nil {
-		return nil, err
-	}
-	return mInfo, nil
+	return
 }
 
 func (m *MediaInfo) GetMovieTrackID()  (*Track,error){

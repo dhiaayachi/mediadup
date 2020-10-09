@@ -7,12 +7,10 @@ import (
 )
 
 func main() {
-	mediainfo, err := GetMediaInfo(os.Args[1])
-	if err != nil {
-		fmt.Println(err.Error())
-		os.Exit(1)
-	}
-	for _,m:= range mediainfo {
+	mfChan := make(chan *MediaInfo)
+	go GetMediaInfo(os.Args[1], mfChan)
+
+	for m:= range mfChan {
 		t, err := m.GetMovieTrackID()
 		if err != nil {
 			fmt.Println(err.Error())
