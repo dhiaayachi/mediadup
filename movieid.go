@@ -51,7 +51,7 @@ func extractYear(name string) ([]string, error) {
 }
 
 func extractName(year string, title string) (string, error) {
-	re,err := regexp.Compile("[^\\s.\\-_]*")
+	re,err := regexp.Compile("[^\\s.\\-_()]*")
 	if err!=nil{
 		return "", err
 	}
