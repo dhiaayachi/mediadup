@@ -128,8 +128,8 @@ func GetMediaInfo(fname string) ([]MediaInfo, error) {
 
 	err = filepath.Walk(fname, func(path string, info os.FileInfo, err error) error {
 		if !info.IsDir() {
-			println(info.Name())
-			out, err := exec.Command(*mediainfoBinary, "--Output=JSON", "-f", fname).Output()
+			//println(info.Name())
+			out, err := exec.Command(*mediainfoBinary, "--Output=JSON", "-f", path).Output()
 
 			if err != nil {
 				return nil
@@ -139,6 +139,7 @@ func GetMediaInfo(fname string) ([]MediaInfo, error) {
 				return nil
 			}
 			mInfo = append(mInfo, i)
+			//println("got a media..." + info.Name())
 		}
 		return nil
 	})
