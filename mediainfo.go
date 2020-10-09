@@ -112,7 +112,15 @@ func IsInstalled() bool {
 }
 
 func (info MediaInfo) IsMedia() bool {
-	return len(info.Media.Track) > 0
+	if len(info.Media.Track) == 0 {
+		return false
+	}
+	for _,t := range info.Media.Track {
+		if t.Type == "Video" {
+			return true
+		}
+	}
+	return false
 }
 
 func GetMediaInfo(fname string) ([]MediaInfo, error) {

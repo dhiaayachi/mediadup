@@ -19,6 +19,9 @@ func main() {
 			os.Exit(1)
 		}
 		movie := t.Movie
+		if !m.IsMedia() {
+			continue
+		}
 		if movie == "" {
 			movie = filepath.Base(m.Media.Ref)
 		}
