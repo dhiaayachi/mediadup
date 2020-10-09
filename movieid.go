@@ -42,7 +42,7 @@ func (md *movieid) SearchMovie(movieName string) (*imdb.MovieResult, error){
 }
 
 func extractYear(name string) ([]string, error) {
-	re,err := regexp.Compile("\\b19|20\\d{2}\\b")
+	re,err := regexp.Compile("\\b19\\d{2}|20\\d{2}\\b")
 	if err!=nil{
 		return nil, err
 	}
