@@ -141,7 +141,7 @@ func GetMediaInfo(fname string) ([]MediaInfo, error) {
 		}
 		return nil
 	})
-	if err != nil {
+	if len(mInfo)==0 && err != nil {
 		return nil, err
 	}
 	return mInfo, nil
