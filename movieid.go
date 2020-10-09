@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"github.com/kenshaw/imdb"
-	"log"
 	"regexp"
 	"strings"
 )
@@ -18,7 +17,6 @@ func NewMovieId() *movieid {
 }
 
 func (md *movieid) SearchMovie(movieName string) (*imdb.MovieResult, error){
-	fmt.Printf("Searching %s ...\n", movieName)
 	y, err := extractYear(movieName)
 	if err != nil {
 		return nil, err
@@ -27,18 +25,15 @@ func (md *movieid) SearchMovie(movieName string) (*imdb.MovieResult, error){
 		return nil, fmt.Errorf("y not found")
 	}
 	for _,year := range y {
-		fmt.Println(year)
 		name, err := extractName(year, movieName)
 		if err != nil {
 			break
 		}
-		fmt.Println(string(name))
 		cl := imdb.New("9ff7bfda")
 		res, err := cl.MovieByTitle(name, year)
 		if err != nil {
 			break
 		}
-		log.Printf(">>> results: %+v", res)
 		return res, nil
 	}
 	return nil, fmt.Errorf("no match found")

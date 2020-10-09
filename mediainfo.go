@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 )
 
@@ -114,30 +115,36 @@ func (info MediaInfo) IsMedia() bool {
 	return len(info.Media.Track) > 0
 }
 
-func GetMediaInfo(fname string) (MediaInfo, error) {
-	info := MediaInfo{}
-
+func GetMediaInfo(fname string) ([]MediaInfo, error) {
 	if !IsInstalled() {
-		return info, fmt.Errorf("must install mediainfo")
+		return nil, fmt.Errorf("must install mediainfo")
 	}
-	fin, err := os.Stat(fname)
+	_, err := os.Stat(fname)
 	if os.IsNotExist(err) {
-		return info, fmt.Errorf("media file not found")
+		return nil, fmt.Errorf("media file not found")
 	}
-	if fin.IsDir() {
-		return info, fmt.Errorf("media file is a directory")
-	}
-	out, err := exec.Command(*mediainfoBinary, "--Output=JSON", "-f", fname).Output()
 
+	var mInfo []MediaInfo
+
+	err = filepath.Walk(fname, func(path string, info os.FileInfo, err error) error {
+		if !info.IsDir() {
+			out, err := exec.Command(*mediainfoBinary, "--Output=JSON", "-f", fname).Output()
+
+			if err != nil {
+				return err
+			}
+			var i MediaInfo
+			if err := json.Unmarshal(out, &i); err != nil {
+				return err
+			}
+			mInfo = append(mInfo, i)
+		}
+		return nil
+	})
 	if err != nil {
-		return info, err
+		return nil, err
 	}
-
-	if err := json.Unmarshal(out, &info); err != nil {
-		return info, err
-	}
-
-	return info, nil
+	return mInfo, nil
 }
 
 func (m *MediaInfo) GetMovieTrackID()  (*Track,error){
