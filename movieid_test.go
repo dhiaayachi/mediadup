@@ -11,6 +11,8 @@ func Test_extractYear(t *testing.T) {
 	}
 	var want []string
 	want = append(want,"1979")
+	var want2 []string
+	want2 = append(want2,"1981")
 	tests := []struct {
 		name    string
 		args    args
@@ -18,6 +20,8 @@ func Test_extractYear(t *testing.T) {
 		wantErr bool
 	}{
 		{ "Alien.1979.BluRay-1080P.mkv",args{"Alien.1979.BluRay-1080P.mkv"},want ,false},
+		{ "For.Your.Eyes.Only.1981.BluRay-1080P.mkv",args{"For.Your.Eyes.Only.1981.BluRay-1080P.mkv"},want2 ,false},
+
 	}
 		for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

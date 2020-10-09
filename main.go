@@ -56,7 +56,11 @@ func getMediaIMDBID(mfChan chan *MediaInfo, mImdbChan chan *LibraryItem) {
 		md := NewMovieId()
 		result, err := md.SearchMovie(movie)
 		if err != nil {
-			log.Println(err.Error())
+			movie = filepath.Base(m.Media.Ref)
+			result, err = md.SearchMovie(movie)
+			if err != nil{
+				log.Println(err.Error())
+			}
 		}
 		if result != nil {
 			log.Printf("%s\n", result.ImdbID)
