@@ -28,6 +28,8 @@ func main() {
 			fmt.Println(err.Error())
 			os.Exit(1)
 		}
-		fmt.Printf("%s\n", result.ImdbID)
+		if result !=nil {
+			fmt.Printf("%s\n", result.ImdbID)
+		}
 	}
 }

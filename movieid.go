@@ -22,7 +22,7 @@ func (md *movieid) SearchMovie(movieName string) (*imdb.MovieResult, error){
 		return nil, err
 	}
 	if len(y) < 1 {
-		return nil, fmt.Errorf("y not found")
+		return nil, nil
 	}
 	for _,year := range y {
 		name, err := extractName(year, movieName)
