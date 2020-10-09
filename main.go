@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 )
 
 func main() {
@@ -18,6 +19,9 @@ func main() {
 		os.Exit(1)
 	}
 	movie := t.Movie
+	if movie == "" {
+		movie = filepath.Base(os.Args[1])
+	}
 	md := NewMovieId()
 	result, err := md.SearchMovie(movie)
 	if err != nil {
