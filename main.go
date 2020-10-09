@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/kenshaw/imdb"
 	"log"
 	"os"
 	"path/filepath"
@@ -9,13 +10,21 @@ import (
 
 func main() {
 	mfChan := make(chan *MediaInfo)
+	mImdbChan := make(chan *imdb.MovieResult)
 	go GetMediaInfo(os.Args[1], mfChan)
 
-	for m:= range mfChan {
+	go getMediaIMDBID(mfChan,mImdbChan)
+	for i := range mImdbChan {
+		fmt.Printf("%s\n", i.ImdbID)
+	}
+}
+
+func getMediaIMDBID(mfChan chan *MediaInfo,mImdbChan chan *imdb.MovieResult) {
+	defer close(mImdbChan)
+	for m := range mfChan {
 		t, err := m.GetMovieTrackID()
 		if err != nil {
 			log.Println(err.Error())
-			os.Exit(1)
 		}
 		movie := t.Movie
 		if !m.IsMedia() {
@@ -28,10 +37,10 @@ func main() {
 		result, err := md.SearchMovie(movie)
 		if err != nil {
 			log.Println(err.Error())
-			os.Exit(1)
 		}
-		if result !=nil {
-			fmt.Printf("%s\n", result.ImdbID)
+		if result != nil {
+			mImdbChan <- result
 		}
+
 	}
 }
