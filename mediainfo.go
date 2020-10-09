@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -135,7 +136,7 @@ func GetMediaInfo(fname string, mfChan chan *MediaInfo) {
 
 	err = filepath.Walk(fname, func(path string, info os.FileInfo, err error) error {
 		if !info.IsDir() {
-			//println(info.Name())
+			//log.Println(info.Name())
 			out, err := exec.Command(*mediainfoBinary, "--Output=JSON", "-f", path).Output()
 
 			if err != nil {
@@ -149,7 +150,7 @@ func GetMediaInfo(fname string, mfChan chan *MediaInfo) {
 				return nil
 			}
 			mfChan <- &i
-			println("got a media..." + info.Name())
+			log.Println("got a media..." + info.Name())
 		}
 		return nil
 	})

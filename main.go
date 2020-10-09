@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"path/filepath"
 )
@@ -13,7 +14,7 @@ func main() {
 	for m:= range mfChan {
 		t, err := m.GetMovieTrackID()
 		if err != nil {
-			fmt.Println(err.Error())
+			log.Println(err.Error())
 			os.Exit(1)
 		}
 		movie := t.Movie
@@ -26,7 +27,7 @@ func main() {
 		md := NewMovieId()
 		result, err := md.SearchMovie(movie)
 		if err != nil {
-			fmt.Println(err.Error())
+			log.Println(err.Error())
 			os.Exit(1)
 		}
 		if result !=nil {

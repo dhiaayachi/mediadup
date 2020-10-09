@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/kenshaw/imdb"
+	"log"
 	"regexp"
 	"strings"
 )
@@ -30,6 +31,7 @@ func (md *movieid) SearchMovie(movieName string) (*imdb.MovieResult, error){
 			break
 		}
 		cl := imdb.New("9ff7bfda")
+		log.Println("finding:" + name + " year:" + year )
 		res, err := cl.MovieByTitle(name, year)
 		if err != nil {
 			break
